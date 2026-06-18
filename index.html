@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="sk"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BEDES Realitná kancelária – Prievidza</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>*{box-sizing:border-box;margin:0;padding:0}
+body{background:#020818;color:#f5f0e8;font-family:'Lato',sans-serif;overflow-x:hidden}
+h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,5rem);line-height:1.1}
+h2{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,3rem);line-height:1.2}
+h3{font-size:clamp(1.1rem,3vw,1.8rem);font-family:'Playfair Display',serif}
+p{font-size:clamp(0.95rem,2vw,1.1rem);line-height:1.7}
+.scene{padding:clamp(20px,5vw,80px)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.btn{display:inline-block;padding:clamp(12px,2vw,18px) clamp(20px,4vw,44px);border-radius:50px}
+canvas{width:100%;height:100%}
+@media(max-width:768px){.nav-dots{display:none}.mascot{width:48px!important;bottom:16px!important;left:auto!important;right:16px!important}.btn{width:100%;display:block;text-align:center;margin:8px 0}.contact-grid{flex-direction:column}.scene-content{padding:16px}}
+@media(max-width:480px){.cards{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
+canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#E8B84B,#E8B84Bcc);z-index:100;width:0%}
+.nav-dots{position:fixed;right:24px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:12px}
+.nav-dot{width:10px;height:10px;border-radius:50%;background:rgba(200,200,200,0.2);cursor:pointer;transition:all 0.3s;border:1px solid #E8B84B55}
+.nav-dot.active{background:#E8B84B;transform:scale(1.3)}
+.mascot{position:fixed;bottom:50px;left:50px;width:80px;z-index:100;cursor:pointer}
+.speech-bubble{position:fixed;bottom:140px;left:20px;background:rgba(5,5,5,0.95);border:1px solid #E8B84B;border-radius:12px;padding:10px 14px;font-size:0.78rem;color:#E8B84B;z-index:100;max-width:180px;display:none}
+.speech-bubble::after{content:'';position:absolute;bottom:-8px;left:30px;border:4px solid transparent;border-top-color:#E8B84B}
+.section-wrap{position:relative;height:500vh}
+.sticky-inner{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.scene-content{position:relative;z-index:10;max-width:900px;width:100%;padding:clamp(20px,5vw,80px);opacity:0;transform:translateY(30px);transition:opacity 0.9s ease,transform 0.9s ease}
+.scene-content.active{opacity:1;transform:translateY(0)}
+nav{position:fixed;top:0;left:0;right:0;z-index:99;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;transition:background 0.3s}
+nav.scrolled{background:rgba(5,5,5,0.95);backdrop-filter:blur(10px)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.3rem;color:#E8B84B}
+.accent{color:#E8B84B}.divider{width:60px;height:2px;background:#E8B84B;margin:16px 0}
+.badge{display:inline-block;background:#E8B84B22;border:1px solid #E8B84B55;color:#E8B84B;padding:6px 16px;border-radius:20px;font-size:0.85rem;margin-bottom:16px}
+.card{background:rgba(255,255,255,0.04);border:1px solid #E8B84B22;border-radius:16px;padding:24px;transition:all 0.3s}
+.card:hover{background:#E8B84B11;border-color:#E8B84B66;transform:translateY(-4px)}
+.card-icon{font-size:2rem;margin-bottom:12px}
+.stat-box{background:#E8B84B11;border:1px solid #E8B84B33;border-radius:12px;padding:20px;text-align:center}
+.stat-number{font-family:'Playfair Display',serif;font-size:2.2rem;color:#E8B84B}
+.stat-label{font-size:0.82rem;color:rgba(245,240,232,0.6);margin-top:4px}
+.quote-block{border-left:3px solid #E8B84B;padding-left:24px;font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.2rem,2.5vw,1.6rem);color:rgba(245,240,232,0.9);margin:24px 0}
+.contact-grid{display:flex;gap:24px;flex-wrap:wrap}
+.contact-item{display:flex;align-items:flex-start;gap:12px;flex:1;min-width:200px}
+.contact-icon{font-size:1.4rem;margin-top:2px}.contact-label{font-size:0.8rem;color:rgba(245,240,232,0.5);margin-bottom:2px}.contact-val{font-size:0.95rem;color:#f5f0e8}
+.btn-primary{background:linear-gradient(135deg,#E8B84B,#E8B84Bcc);color:#080401;font-weight:600;text-decoration:none}
+.btn-outline{background:transparent;border:2px solid #E8B84B;color:#E8B84B;text-decoration:none}
+.btn-wrap{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.counter{display:inline-block}</style></head>
+<body>
+<div id="progress"></div><canvas id="bg"></canvas>
+<nav id="navbar"><div class="nav-logo">BEDES Realitná kancelária</div></nav>
+<div class="nav-dots"><div class="nav-dot active" onclick="scrollToScene(0)"></div><div class="nav-dot" onclick="scrollToScene(1)"></div><div class="nav-dot" onclick="scrollToScene(2)"></div><div class="nav-dot" onclick="scrollToScene(3)"></div><div class="nav-dot" onclick="scrollToScene(4)"></div></div>
+<svg class="mascot" id="mascot" viewBox="0 0 100 130"><ellipse cx="50" cy="52" rx="26" ry="25" fill="#FDBCB4"/><ellipse cx="38" cy="48" rx="5" ry="5.5" fill="#fff"/><ellipse cx="62" cy="48" rx="5" ry="5.5" fill="#fff"/><circle cx="39" cy="49" r="3" fill="#2c3e50"/><circle cx="63" cy="49" r="3" fill="#2c3e50"/><path d="M42,65 Q50,74 58,65" stroke="#c0725c" stroke-width="2.5" fill="none"/><path d="M20,78 L20,126 L80,126 L80,78 Q50,70 20,78Z" fill="#2c3e50"/><path d="M50,78 L42,95 L50,100 L58,95 L50,78Z" fill="#fff"/><polygon points="50,80 47,90 50,96 53,90" fill="#E8B84B"/><rect x="68" y="95" width="22" height="16" rx="3" fill="#8B6914"/></svg>
+<div class="speech-bubble" id="speechBubble">Vitajte!</div>
+<div class="section-wrap" id="scene0wrap"><div class="sticky-inner"><div class="scene-content" id="scene0">
+<div class="badge">🏢 Realitná kancelária · Prievidza</div>
+<h1><span class="accent">BEDES Realitná kancelária</span></h1><div class="divider"></div>
+<p style="max-width:520px;color:rgba(245,240,232,0.8)">BEDES realitná kancelária v Prievidzi — predaj, prenájom a poradenstvo s dlhoročnou tradíciou.</p>
+<div class="btn-wrap"><a href="tel:0910553554" class="btn btn-primary">📞 Kontaktujte nás</a><a href="mailto:info@bedes.sk" class="btn btn-outline">✉️ Napíšte nám</a></div>
+</div></div></div>
+<div class="section-wrap" id="scene1wrap"><div class="sticky-inner"><div class="scene-content" id="scene1"><h2>Náš <span class="accent">Príbeh</span></h2><div class="divider"></div><p style="color:rgba(245,240,232,0.8);margin-bottom:16px">BEDES je zavedená realitná kancelária v Prievidzi s viac ako 53 aktívnymi ponukami a hypotekárnym poradenstvom.</p><p style="color:rgba(245,240,232,0.8);margin-bottom:24px">Naším cieľom je spokojnosť každého klienta — pracujeme s odbornosťou a osobným prístupom.</p><div class="stats" style="margin-top:24px"><div class="stat-box"><div class="stat-number counter" data-target="53">53</div><div class="stat-label">Aktívnych ponúk</div></div><div class="stat-box"><div class="stat-number counter" data-target="10">10</div><div class="stat-label">Rokov na trhu</div></div><div class="stat-box"><div class="stat-number counter" data-target="200">200</div><div class="stat-label">Predaných objektov</div></div><div class="stat-box"><div class="stat-number counter" data-target="100">100</div><div class="stat-label">% spokojnosť</div></div></div></div></div></div>
+<div class="section-wrap" id="scene2wrap"><div class="sticky-inner"><div class="scene-content" id="scene2"><h2>Naše <span class="accent">Služby</span></h2><div class="divider"></div><div class="cards" style="margin-top:24px"><div class="card"><div class="card-icon">🏠</div><h3>Predaj bytov a domov</h3><p style="color:rgba(245,240,232,0.75)">Profesionálna realizácia s dôrazom na kvalitu.</p><p style="color:#E8B84B;margin-top:8px;font-weight:600">Provízia 3% z predajnej ceny</p></div><div class="card"><div class="card-icon">💡</div><h3>Prenájom nehnuteľností</h3><p style="color:rgba(245,240,232,0.75)">Odborný prístup a spoľahlivé výsledky pre každého klienta.</p><p style="color:#E8B84B;margin-top:8px;font-weight:600">Konzultácia zdarma</p></div><div class="card"><div class="card-icon">🔧</div><h3>Ohodnotenie nehnuteľnosti</h3><p style="color:rgba(245,240,232,0.75)">Moderné technológie a certifikovaní odborníci.</p><p style="color:#E8B84B;margin-top:8px;font-weight:600">Prenájom 1 mes. nájom</p></div><div class="card"><div class="card-icon">⭐</div><h3>Hypotekárne poradenstvo</h3><p style="color:rgba(245,240,232,0.75)">Kompletný servis s garanciou spokojnosti klienta.</p><p style="color:#E8B84B;margin-top:8px;font-weight:600">Ohodnotenie od 200 €</p></div></div></div></div></div>
+<div class="section-wrap" id="scene3wrap"><div class="sticky-inner"><div class="scene-content" id="scene3">
+<div class="quote-block">"Váš spoľahlivý partner v nehnuteľnostiach — BEDES Prievidza."</div>
+<p style="color:rgba(245,240,232,0.75);max-width:580px">Naším cieľom je spokojnosť každého klienta. Pracujeme s odbornosťou, precíznosťou a osobným prístupom — pretože každý projekt je pre nás jedinečný.</p>
+</div></div></div>
+<div class="section-wrap" id="scene4wrap"><div class="sticky-inner"><div class="scene-content" id="scene4">
+<h2><span class="accent">Kontakt</span></h2><div class="divider"></div>
+<div class="contact-grid" style="margin-top:24px">
+<div class="contact-item"><span class="contact-icon">📍</span><div><div class="contact-label">Adresa</div><div class="contact-val">M. Mišíka 19/A, 971 01 Prievidza</div></div></div>
+<div class="contact-item"><span class="contact-icon">📞</span><div><div class="contact-label">Telefón</div><div class="contact-val">0910553554</div></div></div>
+<div class="contact-item"><span class="contact-icon">✉️</span><div><div class="contact-label">Email</div><div class="contact-val">info@bedes.sk</div></div></div>
+<div class="contact-item"><span class="contact-icon">🕐</span><div><div class="contact-label">Otváracie hodiny</div><div class="contact-val">Po-Pi 9:00 - 17:00</div></div></div>
+</div>
+<div class="btn-wrap" style="margin-top:32px">
+<a href="https://wa.me/0910553554" class="btn btn-primary">💬 WhatsApp</a>
+<a href="tel:0910553554" class="btn btn-outline">📞 Zavolať</a>
+</div></div></div></div>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const canvas=document.getElementById('bg');const ctx=canvas.getContext('2d');
+let W,H,scrollProgress=0;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}resize();
+window.addEventListener('resize',resize);
+
+let aT=0,lT=0;
+const pts=[];for(let i=0;i<262;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,r:Math.random()*2+0.5});
+function draw(ts){const dt=Math.min(ts-lT,32);lT=ts;aT+=dt*0.001;
+ctx.fillStyle='#020818';ctx.fillRect(0,0,W,H);
+const ng=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,400);ng.addColorStop(0,'rgba(200,146,42,0.05)');ng.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=ng;ctx.fillRect(0,0,W,H);
+pts.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.globalAlpha=0.5;ctx.fillStyle='#E8B84B';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();});
+for(let i=0;i<pts.length;i+=1)for(let j=i+1;j<Math.min(i+4,pts.length);j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctx.globalAlpha=(1-d/120)*0.12;ctx.strokeStyle='#E8B84B';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}}ctx.globalAlpha=1;
+for(let i=0;i<8;i++){const bx=(aT*15+i*200)%W,by=(aT*8+i*150+50)%H;const bg2=ctx.createRadialGradient(bx,by,0,bx,by,40);bg2.addColorStop(0,'rgba(200,160,60,0.07)');bg2.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=bg2;ctx.beginPath();ctx.arc(bx,by,40,0,Math.PI*2);ctx.fill();}
+requestAnimationFrame(draw);}
+requestAnimationFrame(draw);
+window.addEventListener('scroll',()=>{const max=document.body.scrollHeight-window.innerHeight;scrollProgress=window.scrollY/max;document.getElementById('progress').style.width=(scrollProgress*100)+'%';document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);});
+const sceneIds=['scene0','scene1','scene2','scene3','scene4'];
+const speechTexts=['Vitajte — sme tu pre vás!','Pozrite naše možnosti!','Zistite viac o nás!','Kvalita na prvom mieste!','Kontaktujte nás dnes!'];
+let currentScene=-1;
+function setScene(i){if(currentScene===i)return;if(currentScene>=0)document.getElementById(sceneIds[currentScene]).classList.remove('active');currentScene=i;document.getElementById(sceneIds[i]).classList.add('active');document.querySelectorAll('.nav-dot').forEach((d,j)=>d.classList.toggle('active',j===i));const sb=document.getElementById('speechBubble');sb.textContent=speechTexts[i];sb.style.display='block';clearTimeout(sb._t);sb._t=setTimeout(()=>sb.style.display='none',3000);gsap.to('#mascot',{rotation:20,duration:0.2,yoyo:true,repeat:1});document.querySelectorAll('#'+sceneIds[i]+' .counter').forEach(el=>{const target=parseInt(el.dataset.target)||0;let cur=0;const step=()=>{cur+=Math.ceil((target||1)/60);if(cur>=target){el.textContent=target;return}el.textContent=cur;requestAnimationFrame(step)};step();});}
+sceneIds.forEach((id,i)=>{ScrollTrigger.create({trigger:'#'+id+'wrap',start:'top 60%',onEnter:()=>setScene(i),onEnterBack:()=>setScene(i)});});
+gsap.to('#mascot',{y:-12,duration:0.9,ease:'sine.inOut',yoyo:true,repeat:-1});
+document.getElementById('mascot').addEventListener('click',()=>{const msgs=['Dobrý deň! 👋','Tu sme pre vás! 💼','Volajte nás! 📞','Kvalita! ⭐'];const sb=document.getElementById('speechBubble');sb.textContent=msgs[Math.floor(Math.random()*msgs.length)];sb.style.display='block';gsap.to('#mascot',{rotation:360,duration:0.6,ease:'power2.out',onComplete:()=>gsap.set('#mascot',{rotation:0})});clearTimeout(sb._t);sb._t=setTimeout(()=>sb.style.display='none',3000);});
+function scrollToScene(i){window.scrollTo({top:document.getElementById('scene'+i+'wrap').offsetTop,behavior:'smooth'})}
+document.addEventListener('DOMContentLoaded',()=>setScene(0));setScene(0);
+</script></body></html>
